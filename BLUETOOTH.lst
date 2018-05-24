@@ -1,0 +1,800 @@
+   1               		.file	"BLUETOOTH.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__  = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+  15               	.Ltext0:
+  16               	.global	serial_init
+  18               	serial_init:
+  19               	.LFB6:
+  20               	.LM1:
+  21               	.LVL0:
+  22               	/* prologue: function */
+  23               	/* frame size = 0 */
+  24               	.LM2:
+  25 0000 9C01      		movw r18,r24
+  26 0002 40E0      		ldi r20,lo8(0)
+  27 0004 50E0      		ldi r21,hi8(0)
+  28               	.LVL1:
+  29 0006 CA01      		movw r24,r20
+  30 0008 B901      		movw r22,r18
+  31 000a 605A      		subi r22,lo8(-(1500000))
+  32 000c 7C41      		sbci r23,hi8(-(1500000))
+  33 000e 894E      		sbci r24,hlo8(-(1500000))
+  34 0010 9F4F      		sbci r25,hhi8(-(1500000))
+  35 0012 F3E0      		ldi r31,3
+  36 0014 660F      	1:	lsl r22
+  37 0016 771F      		rol r23
+  38 0018 881F      		rol r24
+  39 001a 991F      		rol r25
+  40 001c FA95      		dec r31
+  41 001e 01F4      		brne 1b
+  42 0020 E4E0      		ldi r30,4
+  43 0022 220F      	1:	lsl r18
+  44 0024 331F      		rol r19
+  45 0026 441F      		rol r20
+  46 0028 551F      		rol r21
+  47 002a EA95      		dec r30
+  48 002c 01F4      		brne 1b
+  49               	.LVL2:
+  50 002e 00D0      		rcall __udivmodsi4
+  51               	.LVL3:
+  52 0030 2150      		subi r18,lo8(-(-1))
+  53 0032 3040      		sbci r19,hi8(-(-1))
+  54               	.LVL4:
+  55               	.LM3:
+  56 0034 8FEF      		ldi r24,lo8(-1)
+  57 0036 8093 0000 		sts UQEnd,r24
+  58 003a 8091 0000 		lds r24,UQEnd
+  59 003e 8093 0000 		sts UQFront,r24
+  60               	.LM4:
+  61 0042 30BD      		out 64-32,r19
+  62               	.LVL5:
+  63               	.LM5:
+  64 0044 29B9      		out 41-32,r18
+  65               	.LM6:
+  66 0046 86E8      		ldi r24,lo8(-122)
+  67 0048 80BD      		out 64-32,r24
+  68               	.LM7:
+  69 004a 88E9      		ldi r24,lo8(-104)
+  70 004c 8AB9      		out 42-32,r24
+  71               	.LM8:
+  72               	/* #APP */
+  73               	 ;  39 "serial.h" 1
+  74 004e 7894      		sei
+  75               	 ;  0 "" 2
+  76               	/* epilogue start */
+  77               	.LM9:
+  78               	/* #NOAPP */
+  79 0050 0895      		ret
+  80               	.LFE6:
+  82               	.global	serial_read
+  84               	serial_read:
+  85               	.LFB7:
+  86               	.LM10:
+  87               	/* prologue: function */
+  88               	/* frame size = 0 */
+  89               	.LM11:
+  90 0052 8091 0000 		lds r24,UQFront
+  91 0056 8F3F      		cpi r24,lo8(-1)
+  92 0058 01F4      		brne .L4
+  93 005a E0E0      		ldi r30,lo8(0)
+  94               	.LVL6:
+  95 005c 00C0      		rjmp .L5
+  96               	.LVL7:
+  97               	.L4:
+  98               	.LM12:
+  99 005e E091 0000 		lds r30,UQFront
+ 100 0062 FF27      		clr r31
+ 101 0064 E7FD      		sbrc r30,7
+ 102 0066 F095      		com r31
+ 103 0068 E050      		subi r30,lo8(-(URBuff))
+ 104 006a F040      		sbci r31,hi8(-(URBuff))
+ 105 006c E081      		ld r30,Z
+ 106               	.LVL8:
+ 107               	.LM13:
+ 108 006e 9091 0000 		lds r25,UQFront
+ 109 0072 8091 0000 		lds r24,UQEnd
+ 110 0076 9817      		cp r25,r24
+ 111 0078 01F4      		brne .L6
+ 112               	.LM14:
+ 113 007a 8FEF      		ldi r24,lo8(-1)
+ 114 007c 8093 0000 		sts UQEnd,r24
+ 115 0080 8091 0000 		lds r24,UQEnd
+ 116 0084 8093 0000 		sts UQFront,r24
+ 117 0088 00C0      		rjmp .L5
+ 118               	.L6:
+ 119               	.LM15:
+ 120 008a 8091 0000 		lds r24,UQFront
+ 121 008e 8F5F      		subi r24,lo8(-(1))
+ 122 0090 8093 0000 		sts UQFront,r24
+ 123               	.LM16:
+ 124 0094 8091 0000 		lds r24,UQFront
+ 125               	.L5:
+ 126               	.LM17:
+ 127 0098 8E2F      		mov r24,r30
+ 128               	/* epilogue start */
+ 129 009a 0895      		ret
+ 130               	.LFE7:
+ 132               	.global	serial_char
+ 134               	serial_char:
+ 135               	.LFB8:
+ 136               	.LM18:
+ 137               	/* prologue: function */
+ 138               	/* frame size = 0 */
+ 139               	.LVL9:
+ 140               	.L9:
+ 141               	.LM19:
+ 142 009c 5D9B      		sbis 43-32,5
+ 143 009e 00C0      		rjmp .L9
+ 144               	.LM20:
+ 145 00a0 8CB9      		out 44-32,r24
+ 146               	/* epilogue start */
+ 147               	.LM21:
+ 148 00a2 0895      		ret
+ 149               	.LFE8:
+ 151               	.global	serial_string
+ 153               	serial_string:
+ 154               	.LFB10:
+ 155               	.LM22:
+ 156               	.LVL10:
+ 157               	/* prologue: function */
+ 158               	/* frame size = 0 */
+ 159 00a4 FC01      		movw r30,r24
+ 160 00a6 00C0      		rjmp .L13
+ 161               	.LVL11:
+ 162               	.L16:
+ 163               	.LBB4:
+ 164               	.LBB5:
+ 165               	.LM23:
+ 166 00a8 5D9B      		sbis 43-32,5
+ 167 00aa 00C0      		rjmp .L16
+ 168               	.LM24:
+ 169 00ac 8CB9      		out 44-32,r24
+ 170               	.LBE5:
+ 171               	.LBE4:
+ 172               	.LM25:
+ 173 00ae 3196      		adiw r30,1
+ 174               	.LVL12:
+ 175               	.L13:
+ 176               	.LM26:
+ 177 00b0 8081      		ld r24,Z
+ 178 00b2 8823      		tst r24
+ 179 00b4 01F4      		brne .L16
+ 180               	/* epilogue start */
+ 181               	.LM27:
+ 182 00b6 0895      		ret
+ 183               	.LFE10:
+ 185               	.global	UReadBuffer
+ 187               	UReadBuffer:
+ 188               	.LFB11:
+ 189               	.LM28:
+ 190               	.LVL13:
+ 191 00b8 EF92      		push r14
+ 192 00ba FF92      		push r15
+ 193 00bc 0F93      		push r16
+ 194 00be 1F93      		push r17
+ 195 00c0 CF93      		push r28
+ 196 00c2 DF93      		push r29
+ 197               	/* prologue: function */
+ 198               	/* frame size = 0 */
+ 199 00c4 7C01      		movw r14,r24
+ 200 00c6 8B01      		movw r16,r22
+ 201               	.LM29:
+ 202 00c8 C0E0      		ldi r28,lo8(0)
+ 203 00ca D0E0      		ldi r29,hi8(0)
+ 204               	.LVL14:
+ 205 00cc 00C0      		rjmp .L19
+ 206               	.LVL15:
+ 207               	.L20:
+ 208               	.LM30:
+ 209 00ce 00D0      		rcall serial_read
+ 210 00d0 F701      		movw r30,r14
+ 211 00d2 EC0F      		add r30,r28
+ 212 00d4 FD1F      		adc r31,r29
+ 213 00d6 8083      		st Z,r24
+ 214               	.LM31:
+ 215 00d8 2196      		adiw r28,1
+ 216               	.LVL16:
+ 217               	.L19:
+ 218 00da C017      		cp r28,r16
+ 219 00dc D107      		cpc r29,r17
+ 220 00de 00F0      		brlo .L20
+ 221               	/* epilogue start */
+ 222               	.LM32:
+ 223 00e0 DF91      		pop r29
+ 224 00e2 CF91      		pop r28
+ 225               	.LVL17:
+ 226 00e4 1F91      		pop r17
+ 227 00e6 0F91      		pop r16
+ 228               	.LVL18:
+ 229 00e8 FF90      		pop r15
+ 230 00ea EF90      		pop r14
+ 231               	.LVL19:
+ 232 00ec 0895      		ret
+ 233               	.LFE11:
+ 235               	.global	serialdata_available
+ 237               	serialdata_available:
+ 238               	.LFB12:
+ 239               	.LM33:
+ 240               	/* prologue: function */
+ 241               	/* frame size = 0 */
+ 242               	.LM34:
+ 243 00ee 8091 0000 		lds r24,UQFront
+ 244 00f2 8F3F      		cpi r24,lo8(-1)
+ 245 00f4 01F4      		brne .L23
+ 246 00f6 90E0      		ldi r25,lo8(0)
+ 247 00f8 00C0      		rjmp .L24
+ 248               	.L23:
+ 249               	.LM35:
+ 250 00fa 9091 0000 		lds r25,UQFront
+ 251 00fe 8091 0000 		lds r24,UQEnd
+ 252 0102 9817      		cp r25,r24
+ 253 0104 04F4      		brge .L25
+ 254               	.LM36:
+ 255 0106 9091 0000 		lds r25,UQEnd
+ 256 010a 8091 0000 		lds r24,UQFront
+ 257 010e 9F5F      		subi r25,lo8(-(1))
+ 258 0110 00C0      		rjmp .L28
+ 259               	.L25:
+ 260               	.LM37:
+ 261 0112 9091 0000 		lds r25,UQFront
+ 262 0116 8091 0000 		lds r24,UQEnd
+ 263 011a 8917      		cp r24,r25
+ 264 011c 04F0      		brlt .L26
+ 265 011e 91E0      		ldi r25,lo8(1)
+ 266 0120 00C0      		rjmp .L24
+ 267               	.L26:
+ 268               	.LM38:
+ 269 0122 9091 0000 		lds r25,UQEnd
+ 270 0126 8091 0000 		lds r24,UQFront
+ 271 012a 9F57      		subi r25,lo8(-(-127))
+ 272               	.L28:
+ 273 012c 981B      		sub r25,r24
+ 274               	.L24:
+ 275               	.LM39:
+ 276 012e 892F      		mov r24,r25
+ 277               	/* epilogue start */
+ 278 0130 0895      		ret
+ 279               	.LFE12:
+ 281               	.global	UFlushBuffer
+ 283               	UFlushBuffer:
+ 284               	.LFB13:
+ 285               	.LM40:
+ 286               	/* prologue: function */
+ 287               	/* frame size = 0 */
+ 288 0132 00C0      		rjmp .L30
+ 289               	.L31:
+ 290               	.LM41:
+ 291 0134 00D0      		rcall serial_read
+ 292               	.L30:
+ 293               	.LM42:
+ 294 0136 00D0      		rcall serialdata_available
+ 295 0138 8823      		tst r24
+ 296 013a 01F4      		brne .L31
+ 297               	/* epilogue start */
+ 298               	.LM43:
+ 299 013c 0895      		ret
+ 300               	.LFE13:
+ 302               	.global	__vector_11
+ 304               	__vector_11:
+ 305               	.LFB14:
+ 306               	.LM44:
+ 307 013e 1F92      		push __zero_reg__
+ 308 0140 0F92      		push r0
+ 309 0142 0FB6      		in r0,__SREG__
+ 310 0144 0F92      		push r0
+ 311 0146 1124      		clr __zero_reg__
+ 312 0148 2F93      		push r18
+ 313 014a 3F93      		push r19
+ 314 014c 4F93      		push r20
+ 315 014e 8F93      		push r24
+ 316 0150 9F93      		push r25
+ 317 0152 EF93      		push r30
+ 318 0154 FF93      		push r31
+ 319               	/* prologue: Signal */
+ 320               	/* frame size = 0 */
+ 321               	.LM45:
+ 322 0156 4CB1      		in r20,44-32
+ 323               	.LVL20:
+ 324               	.LM46:
+ 325 0158 8091 0000 		lds r24,UQEnd
+ 326 015c 8F37      		cpi r24,lo8(127)
+ 327 015e 01F4      		brne .L34
+ 328 0160 8091 0000 		lds r24,UQFront
+ 329 0164 8823      		tst r24
+ 330 0166 01F0      		breq .L35
+ 331               	.L34:
+ 332 0168 8091 0000 		lds r24,UQEnd
+ 333 016c 2091 0000 		lds r18,UQFront
+ 334 0170 9927      		clr r25
+ 335 0172 87FD      		sbrc r24,7
+ 336 0174 9095      		com r25
+ 337 0176 0196      		adiw r24,1
+ 338 0178 3327      		clr r19
+ 339 017a 27FD      		sbrc r18,7
+ 340 017c 3095      		com r19
+ 341 017e 8217      		cp r24,r18
+ 342 0180 9307      		cpc r25,r19
+ 343 0182 01F4      		brne .L36
+ 344               	.L35:
+ 345               	.LM47:
+ 346 0184 8091 0000 		lds r24,UQFront
+ 347 0188 8F5F      		subi r24,lo8(-(1))
+ 348 018a 8093 0000 		sts UQFront,r24
+ 349               	.LM48:
+ 350 018e 8091 0000 		lds r24,UQFront
+ 351               	.L36:
+ 352               	.LM49:
+ 353 0192 8091 0000 		lds r24,UQEnd
+ 354 0196 8F37      		cpi r24,lo8(127)
+ 355 0198 01F4      		brne .L37
+ 356               	.LM50:
+ 357 019a 1092 0000 		sts UQEnd,__zero_reg__
+ 358 019e 00C0      		rjmp .L38
+ 359               	.L37:
+ 360               	.LM51:
+ 361 01a0 8091 0000 		lds r24,UQEnd
+ 362 01a4 8F5F      		subi r24,lo8(-(1))
+ 363 01a6 8093 0000 		sts UQEnd,r24
+ 364               	.L38:
+ 365               	.LM52:
+ 366 01aa E091 0000 		lds r30,UQEnd
+ 367 01ae FF27      		clr r31
+ 368 01b0 E7FD      		sbrc r30,7
+ 369 01b2 F095      		com r31
+ 370 01b4 E050      		subi r30,lo8(-(URBuff))
+ 371 01b6 F040      		sbci r31,hi8(-(URBuff))
+ 372 01b8 4083      		st Z,r20
+ 373               	.LM53:
+ 374 01ba 8091 0000 		lds r24,UQFront
+ 375 01be 8F3F      		cpi r24,lo8(-1)
+ 376 01c0 01F4      		brne .L40
+ 377 01c2 1092 0000 		sts UQFront,__zero_reg__
+ 378               	.L40:
+ 379               	/* epilogue start */
+ 380               	.LM54:
+ 381 01c6 FF91      		pop r31
+ 382 01c8 EF91      		pop r30
+ 383 01ca 9F91      		pop r25
+ 384 01cc 8F91      		pop r24
+ 385 01ce 4F91      		pop r20
+ 386               	.LVL21:
+ 387 01d0 3F91      		pop r19
+ 388 01d2 2F91      		pop r18
+ 389 01d4 0F90      		pop r0
+ 390 01d6 0FBE      		out __SREG__,r0
+ 391 01d8 0F90      		pop r0
+ 392 01da 1F90      		pop __zero_reg__
+ 393 01dc 1895      		reti
+ 394               	.LFE14:
+ 396               	.global	bluetooth_read
+ 398               	bluetooth_read:
+ 399               	.LFB16:
+ 400               	.LM55:
+ 401               	.LVL22:
+ 402 01de 1F93      		push r17
+ 403 01e0 CF93      		push r28
+ 404 01e2 DF93      		push r29
+ 405               	/* prologue: function */
+ 406               	/* frame size = 0 */
+ 407 01e4 EC01      		movw r28,r24
+ 408 01e6 162F      		mov r17,r22
+ 409               	.LVL23:
+ 410               	.L42:
+ 411               	.LM56:
+ 412 01e8 00D0      		rcall serialdata_available
+ 413 01ea 8117      		cp r24,r17
+ 414 01ec 00F0      		brlo .L42
+ 415               	.LM57:
+ 416 01ee CE01      		movw r24,r28
+ 417 01f0 612F      		mov r22,r17
+ 418 01f2 70E0      		ldi r23,lo8(0)
+ 419 01f4 00D0      		rcall UReadBuffer
+ 420               	/* epilogue start */
+ 421               	.LM58:
+ 422 01f6 DF91      		pop r29
+ 423 01f8 CF91      		pop r28
+ 424               	.LVL24:
+ 425 01fa 1F91      		pop r17
+ 426               	.LVL25:
+ 427 01fc 0895      		ret
+ 428               	.LFE16:
+ 430               	.global	str_num
+ 432               	str_num:
+ 433               	.LFB17:
+ 434               	.LM59:
+ 435               	.LVL26:
+ 436               	/* prologue: function */
+ 437               	/* frame size = 0 */
+ 438               	.LM60:
+ 439 01fe 00D0      		rcall atoi
+ 440               	.LVL27:
+ 441               	/* epilogue start */
+ 442               	.LM61:
+ 443 0200 0895      		ret
+ 444               	.LFE17:
+ 446               	.global	compare
+ 448               	compare:
+ 449               	.LFB15:
+ 450               	.LM62:
+ 451               	.LVL28:
+ 452               	/* prologue: function */
+ 453               	/* frame size = 0 */
+ 454               	.LM63:
+ 455 0202 DB01      		movw r26,r22
+ 456 0204 0D90      		ld __tmp_reg__,X+
+ 457 0206 0020      		tst __tmp_reg__
+ 458 0208 01F4      		brne .-6
+ 459 020a 1197      		sbiw r26,1
+ 460 020c A61B      		sub r26,r22
+ 461 020e B70B      		sbc r27,r23
+ 462               	.LM64:
+ 463 0210 4A2F      		mov r20,r26
+ 464 0212 50E0      		ldi r21,lo8(0)
+ 465 0214 00D0      		rcall strncasecmp
+ 466               	.LVL29:
+ 467 0216 20E0      		ldi r18,lo8(0)
+ 468 0218 30E0      		ldi r19,hi8(0)
+ 469 021a 892B      		or r24,r25
+ 470 021c 01F4      		brne .L48
+ 471 021e 21E0      		ldi r18,lo8(1)
+ 472 0220 30E0      		ldi r19,hi8(1)
+ 473               	.L48:
+ 474               	.LM65:
+ 475 0222 C901      		movw r24,r18
+ 476               	/* epilogue start */
+ 477 0224 0895      		ret
+ 478               	.LFE15:
+ 480               		.data
+ 481               	.LC0:
+ 482 0000 6F6E 6E00 		.string	"onn"
+ 483               	.LC1:
+ 484 0004 6F66 6600 		.string	"off"
+ 485               	.LC2:
+ 486 0008 3000      		.string	"0"
+ 487               	.LC3:
+ 488 000a 3100      		.string	"1"
+ 489               	.LC4:
+ 490 000c 3200      		.string	"2"
+ 491               	.LC5:
+ 492 000e 3300      		.string	"3"
+ 493               	.LC6:
+ 494 0010 3400      		.string	"4"
+ 495               	.LC7:
+ 496 0012 3500      		.string	"5"
+ 497               	.LC8:
+ 498 0014 3600      		.string	"6"
+ 499               	.LC9:
+ 500 0016 3700      		.string	"7"
+ 501               	.LC10:
+ 502 0018 3800      		.string	"8"
+ 503               	.LC11:
+ 504 001a 3900      		.string	"9"
+ 505               	.LC12:
+ 506 001c 3130 00   		.string	"10"
+ 507               		.text
+ 508               	.global	main
+ 510               	main:
+ 511               	.LFB18:
+ 512               	.LM66:
+ 513 0226 0F93      		push r16
+ 514 0228 1F93      		push r17
+ 515 022a DF93      		push r29
+ 516 022c CF93      		push r28
+ 517 022e CDB7      		in r28,__SP_L__
+ 518 0230 DEB7      		in r29,__SP_H__
+ 519 0232 2A97      		sbiw r28,10
+ 520 0234 0FB6      		in __tmp_reg__,__SREG__
+ 521 0236 F894      		cli
+ 522 0238 DEBF      		out __SP_H__,r29
+ 523 023a 0FBE      		out __SREG__,__tmp_reg__
+ 524 023c CDBF      		out __SP_L__,r28
+ 525               	/* prologue: function */
+ 526               	/* frame size = 10 */
+ 527               	.LM67:
+ 528 023e 80E8      		ldi r24,lo8(9600)
+ 529 0240 95E2      		ldi r25,hi8(9600)
+ 530 0242 00D0      		rcall serial_init
+ 531               	.LM68:
+ 532 0244 8E01      		movw r16,r28
+ 533 0246 0F5F      		subi r16,lo8(-(1))
+ 534 0248 1F4F      		sbci r17,hi8(-(1))
+ 535               	.L67:
+ 536 024a C801      		movw r24,r16
+ 537 024c 63E0      		ldi r22,lo8(3)
+ 538 024e 00D0      		rcall bluetooth_read
+ 539               	.LM69:
+ 540 0250 C801      		movw r24,r16
+ 541 0252 60E0      		ldi r22,lo8(.LC0)
+ 542 0254 70E0      		ldi r23,hi8(.LC0)
+ 543 0256 00D0      		rcall compare
+ 544 0258 0197      		sbiw r24,1
+ 545 025a 01F4      		brne .L51
+ 546               	.LM70:
+ 547 025c 82E0      		ldi r24,lo8(2)
+ 548 025e 90E0      		ldi r25,hi8(2)
+ 549 0260 69E0      		ldi r22,lo8(9)
+ 550 0262 70E0      		ldi r23,hi8(9)
+ 551 0264 41E0      		ldi r20,lo8(1)
+ 552 0266 50E0      		ldi r21,hi8(1)
+ 553 0268 00D0      		rcall write
+ 554               	.L51:
+ 555               	.LM71:
+ 556 026a C801      		movw r24,r16
+ 557 026c 60E0      		ldi r22,lo8(.LC1)
+ 558 026e 70E0      		ldi r23,hi8(.LC1)
+ 559 0270 00D0      		rcall compare
+ 560 0272 0197      		sbiw r24,1
+ 561 0274 01F4      		brne .L52
+ 562               	.LM72:
+ 563 0276 82E0      		ldi r24,lo8(2)
+ 564 0278 90E0      		ldi r25,hi8(2)
+ 565 027a 69E0      		ldi r22,lo8(9)
+ 566 027c 70E0      		ldi r23,hi8(9)
+ 567 027e 40E0      		ldi r20,lo8(0)
+ 568 0280 50E0      		ldi r21,hi8(0)
+ 569 0282 00D0      		rcall write
+ 570               	.L52:
+ 571               	.LM73:
+ 572 0284 C801      		movw r24,r16
+ 573 0286 60E0      		ldi r22,lo8(.LC2)
+ 574 0288 70E0      		ldi r23,hi8(.LC2)
+ 575 028a 00D0      		rcall compare
+ 576 028c 0197      		sbiw r24,1
+ 577 028e 01F4      		brne .L53
+ 578               	.LM74:
+ 579 0290 82E0      		ldi r24,lo8(2)
+ 580 0292 90E0      		ldi r25,hi8(2)
+ 581 0294 6BE5      		ldi r22,lo8(91)
+ 582 0296 70E0      		ldi r23,hi8(91)
+ 583 0298 40E0      		ldi r20,lo8(0)
+ 584 029a 50E0      		ldi r21,hi8(0)
+ 585 029c 00D0      		rcall write
+ 586               	.L53:
+ 587               	.LM75:
+ 588 029e C801      		movw r24,r16
+ 589 02a0 60E0      		ldi r22,lo8(.LC3)
+ 590 02a2 70E0      		ldi r23,hi8(.LC3)
+ 591 02a4 00D0      		rcall compare
+ 592 02a6 0197      		sbiw r24,1
+ 593 02a8 01F4      		brne .L54
+ 594               	.LM76:
+ 595 02aa 82E0      		ldi r24,lo8(2)
+ 596 02ac 90E0      		ldi r25,hi8(2)
+ 597 02ae 6BE5      		ldi r22,lo8(91)
+ 598 02b0 70E0      		ldi r23,hi8(91)
+ 599 02b2 41E0      		ldi r20,lo8(1)
+ 600 02b4 50E0      		ldi r21,hi8(1)
+ 601 02b6 00D0      		rcall write
+ 602               	.L54:
+ 603               	.LM77:
+ 604 02b8 C801      		movw r24,r16
+ 605 02ba 60E0      		ldi r22,lo8(.LC4)
+ 606 02bc 70E0      		ldi r23,hi8(.LC4)
+ 607 02be 00D0      		rcall compare
+ 608 02c0 0197      		sbiw r24,1
+ 609 02c2 01F4      		brne .L55
+ 610               	.LM78:
+ 611 02c4 82E0      		ldi r24,lo8(2)
+ 612 02c6 90E0      		ldi r25,hi8(2)
+ 613 02c8 6BE5      		ldi r22,lo8(91)
+ 614 02ca 70E0      		ldi r23,hi8(91)
+ 615 02cc 42E0      		ldi r20,lo8(2)
+ 616 02ce 50E0      		ldi r21,hi8(2)
+ 617 02d0 00D0      		rcall write
+ 618               	.L55:
+ 619               	.LM79:
+ 620 02d2 C801      		movw r24,r16
+ 621 02d4 60E0      		ldi r22,lo8(.LC5)
+ 622 02d6 70E0      		ldi r23,hi8(.LC5)
+ 623 02d8 00D0      		rcall compare
+ 624 02da 0197      		sbiw r24,1
+ 625 02dc 01F4      		brne .L56
+ 626               	.LM80:
+ 627 02de 82E0      		ldi r24,lo8(2)
+ 628 02e0 90E0      		ldi r25,hi8(2)
+ 629 02e2 6BE5      		ldi r22,lo8(91)
+ 630 02e4 70E0      		ldi r23,hi8(91)
+ 631 02e6 43E0      		ldi r20,lo8(3)
+ 632 02e8 50E0      		ldi r21,hi8(3)
+ 633 02ea 00D0      		rcall write
+ 634               	.L56:
+ 635               	.LM81:
+ 636 02ec C801      		movw r24,r16
+ 637 02ee 60E0      		ldi r22,lo8(.LC6)
+ 638 02f0 70E0      		ldi r23,hi8(.LC6)
+ 639 02f2 00D0      		rcall compare
+ 640 02f4 0197      		sbiw r24,1
+ 641 02f6 01F4      		brne .L57
+ 642               	.LM82:
+ 643 02f8 82E0      		ldi r24,lo8(2)
+ 644 02fa 90E0      		ldi r25,hi8(2)
+ 645 02fc 6BE5      		ldi r22,lo8(91)
+ 646 02fe 70E0      		ldi r23,hi8(91)
+ 647 0300 44E0      		ldi r20,lo8(4)
+ 648 0302 50E0      		ldi r21,hi8(4)
+ 649 0304 00D0      		rcall write
+ 650               	.L57:
+ 651               	.LM83:
+ 652 0306 C801      		movw r24,r16
+ 653 0308 60E0      		ldi r22,lo8(.LC7)
+ 654 030a 70E0      		ldi r23,hi8(.LC7)
+ 655 030c 00D0      		rcall compare
+ 656 030e 0197      		sbiw r24,1
+ 657 0310 01F4      		brne .L58
+ 658               	.LM84:
+ 659 0312 82E0      		ldi r24,lo8(2)
+ 660 0314 90E0      		ldi r25,hi8(2)
+ 661 0316 6BE5      		ldi r22,lo8(91)
+ 662 0318 70E0      		ldi r23,hi8(91)
+ 663 031a 45E0      		ldi r20,lo8(5)
+ 664 031c 50E0      		ldi r21,hi8(5)
+ 665 031e 00D0      		rcall write
+ 666               	.L58:
+ 667               	.LM85:
+ 668 0320 C801      		movw r24,r16
+ 669 0322 60E0      		ldi r22,lo8(.LC8)
+ 670 0324 70E0      		ldi r23,hi8(.LC8)
+ 671 0326 00D0      		rcall compare
+ 672 0328 0197      		sbiw r24,1
+ 673 032a 01F4      		brne .L59
+ 674               	.LM86:
+ 675 032c 82E0      		ldi r24,lo8(2)
+ 676 032e 90E0      		ldi r25,hi8(2)
+ 677 0330 6BE5      		ldi r22,lo8(91)
+ 678 0332 70E0      		ldi r23,hi8(91)
+ 679 0334 46E0      		ldi r20,lo8(6)
+ 680 0336 50E0      		ldi r21,hi8(6)
+ 681 0338 00D0      		rcall write
+ 682               	.L59:
+ 683               	.LM87:
+ 684 033a C801      		movw r24,r16
+ 685 033c 60E0      		ldi r22,lo8(.LC9)
+ 686 033e 70E0      		ldi r23,hi8(.LC9)
+ 687 0340 00D0      		rcall compare
+ 688 0342 0197      		sbiw r24,1
+ 689 0344 01F4      		brne .L60
+ 690               	.LM88:
+ 691 0346 82E0      		ldi r24,lo8(2)
+ 692 0348 90E0      		ldi r25,hi8(2)
+ 693 034a 6BE5      		ldi r22,lo8(91)
+ 694 034c 70E0      		ldi r23,hi8(91)
+ 695 034e 47E0      		ldi r20,lo8(7)
+ 696 0350 50E0      		ldi r21,hi8(7)
+ 697 0352 00D0      		rcall write
+ 698               	.L60:
+ 699               	.LM89:
+ 700 0354 C801      		movw r24,r16
+ 701 0356 60E0      		ldi r22,lo8(.LC10)
+ 702 0358 70E0      		ldi r23,hi8(.LC10)
+ 703 035a 00D0      		rcall compare
+ 704 035c 0197      		sbiw r24,1
+ 705 035e 01F4      		brne .L61
+ 706               	.LM90:
+ 707 0360 82E0      		ldi r24,lo8(2)
+ 708 0362 90E0      		ldi r25,hi8(2)
+ 709 0364 6BE5      		ldi r22,lo8(91)
+ 710 0366 70E0      		ldi r23,hi8(91)
+ 711 0368 48E0      		ldi r20,lo8(8)
+ 712 036a 50E0      		ldi r21,hi8(8)
+ 713 036c 00D0      		rcall write
+ 714               	.L61:
+ 715               	.LM91:
+ 716 036e C801      		movw r24,r16
+ 717 0370 60E0      		ldi r22,lo8(.LC11)
+ 718 0372 70E0      		ldi r23,hi8(.LC11)
+ 719 0374 00D0      		rcall compare
+ 720 0376 0197      		sbiw r24,1
+ 721 0378 01F4      		brne .L62
+ 722               	.LM92:
+ 723 037a 82E0      		ldi r24,lo8(2)
+ 724 037c 90E0      		ldi r25,hi8(2)
+ 725 037e 6BE5      		ldi r22,lo8(91)
+ 726 0380 70E0      		ldi r23,hi8(91)
+ 727 0382 49E0      		ldi r20,lo8(9)
+ 728 0384 50E0      		ldi r21,hi8(9)
+ 729 0386 00D0      		rcall write
+ 730               	.L62:
+ 731               	.LM93:
+ 732 0388 C801      		movw r24,r16
+ 733 038a 60E0      		ldi r22,lo8(.LC12)
+ 734 038c 70E0      		ldi r23,hi8(.LC12)
+ 735 038e 00D0      		rcall compare
+ 736 0390 0197      		sbiw r24,1
+ 737 0392 01F0      		breq .+2
+ 738 0394 00C0      		rjmp .L67
+ 739               	.LM94:
+ 740 0396 82E0      		ldi r24,lo8(2)
+ 741 0398 90E0      		ldi r25,hi8(2)
+ 742 039a 6BE5      		ldi r22,lo8(91)
+ 743 039c 70E0      		ldi r23,hi8(91)
+ 744 039e 4AE0      		ldi r20,lo8(10)
+ 745 03a0 50E0      		ldi r21,hi8(10)
+ 746 03a2 00D0      		rcall write
+ 747 03a4 00C0      		rjmp .L67
+ 748               	.LFE18:
+ 750               	.global	serial_num
+ 752               	serial_num:
+ 753               	.LFB9:
+ 754               	.LM95:
+ 755               	.LVL30:
+ 756 03a6 0F93      		push r16
+ 757 03a8 1F93      		push r17
+ 758 03aa DF93      		push r29
+ 759 03ac CF93      		push r28
+ 760 03ae CDB7      		in r28,__SP_L__
+ 761 03b0 DEB7      		in r29,__SP_H__
+ 762 03b2 2797      		sbiw r28,7
+ 763 03b4 0FB6      		in __tmp_reg__,__SREG__
+ 764 03b6 F894      		cli
+ 765 03b8 DEBF      		out __SP_H__,r29
+ 766 03ba 0FBE      		out __SREG__,__tmp_reg__
+ 767 03bc CDBF      		out __SP_L__,r28
+ 768               	/* prologue: function */
+ 769               	/* frame size = 7 */
+ 770               	.LM96:
+ 771 03be 8E01      		movw r16,r28
+ 772 03c0 0F5F      		subi r16,lo8(-(1))
+ 773 03c2 1F4F      		sbci r17,hi8(-(1))
+ 774 03c4 A801      		movw r20,r16
+ 775 03c6 2AE0      		ldi r18,lo8(10)
+ 776 03c8 30E0      		ldi r19,hi8(10)
+ 777 03ca 00D0      		rcall ltoa
+ 778               	.LVL31:
+ 779               	.LM97:
+ 780 03cc C801      		movw r24,r16
+ 781 03ce 00D0      		rcall serial_string
+ 782               	/* epilogue start */
+ 783               	.LM98:
+ 784 03d0 2796      		adiw r28,7
+ 785 03d2 0FB6      		in __tmp_reg__,__SREG__
+ 786 03d4 F894      		cli
+ 787 03d6 DEBF      		out __SP_H__,r29
+ 788 03d8 0FBE      		out __SREG__,__tmp_reg__
+ 789 03da CDBF      		out __SP_L__,r28
+ 790 03dc CF91      		pop r28
+ 791 03de DF91      		pop r29
+ 792 03e0 1F91      		pop r17
+ 793 03e2 0F91      		pop r16
+ 794 03e4 0895      		ret
+ 795               	.LFE9:
+ 797               		.comm URBuff,128,1
+ 798               		.comm UQFront,1,1
+ 799               		.comm UQEnd,1,1
+ 920               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 BLUETOOTH.c
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:2      *ABS*:0000003f __SREG__
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:3      *ABS*:0000003e __SP_H__
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:4      *ABS*:0000003d __SP_L__
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:5      *ABS*:00000034 __CCP__
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:6      *ABS*:00000000 __tmp_reg__
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:7      *ABS*:00000001 __zero_reg__
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:18     .text:00000000 serial_init
+                            *COM*:00000001 UQEnd
+                            *COM*:00000001 UQFront
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:84     .text:00000052 serial_read
+                            *COM*:00000080 URBuff
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:134    .text:0000009c serial_char
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:153    .text:000000a4 serial_string
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:187    .text:000000b8 UReadBuffer
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:237    .text:000000ee serialdata_available
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:283    .text:00000132 UFlushBuffer
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:304    .text:0000013e __vector_11
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:398    .text:000001de bluetooth_read
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:432    .text:000001fe str_num
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:448    .text:00000202 compare
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:510    .text:00000226 main
+C:\Users\KEDARN~1\AppData\Local\Temp/ccU6xRae.s:752    .text:000003a6 serial_num
+
+UNDEFINED SYMBOLS
+__udivmodsi4
+atoi
+strncasecmp
+write
+ltoa
+__do_copy_data
+__do_clear_bss
